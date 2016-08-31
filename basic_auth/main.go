@@ -1,19 +1,19 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
-	"sync"
 
 	"github.com/abbot/go-http-auth"
 	"github.com/varung/letsproxy"
 	"rsc.io/letsencrypt"
 )
 
-var mut = sync.Mutex{}
-
 func main() {
-	proxyFunc := letsproxy.Proxy("127.0.0.1:8888")
+	target := flag.String("target", "127.0.0.1:8888", "where to proxy the connection to")
+	flag.Parse()
+	proxyFunc := letsproxy.Proxy(*target)
 	secrets := auth.HtpasswdFileProvider("example.htpasswd")
 	authenticator := auth.NewBasicAuthenticator("varunlab.com", secrets)
 	http.HandleFunc("/", authenticator.Wrap(func(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
