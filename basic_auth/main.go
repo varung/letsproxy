@@ -13,6 +13,7 @@ import (
 func main() {
 	target := flag.String("target", "127.0.0.1:8888", "where to proxy the connection to")
 	flag.Parse()
+	log.Println("target: ", *target)
 	proxyFunc := letsproxy.Proxy(*target)
 	secrets := auth.HtpasswdFileProvider("example.htpasswd")
 	authenticator := auth.NewBasicAuthenticator("varunlab.com", secrets)

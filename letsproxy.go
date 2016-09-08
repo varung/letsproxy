@@ -8,6 +8,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
+	"time"
 )
 
 func Proxy(target string) func(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +21,8 @@ func Proxy(target string) func(w http.ResponseWriter, r *http.Request) {
 		if !IsWebSocket(r) {
 			httpProxy.ServeHTTP(w, r)
 		} else {
-			d, err := net.Dial("tcp", target)
+			dialer := net.Dialer{KeepAlive: time.Second * 10}
+			d, err := dialer.Dial("tcp", target)
 			if err != nil {
 				http.Error(w, "Error contacting backend server.", 500)
 				log.Printf("Error dialing websocket backend %s: %v", target, err)
