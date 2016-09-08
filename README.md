@@ -1,13 +1,14 @@
 # letsproxy
 golang https and websocket reverse proxy using letsencrypt to automatically setup SSL certs
+authenticated versions as well
 
-Why?
-iPython notebook is a http/websockets app that does not have any security measures in place to protect access from the WAN/public internet.
+Why? You want to run a web server behind SSL and authentication. letsproxy uses let's encrypt to automatically generate a SSL certificate, and then proxies traffic to your server. Optionally, it can protect access via http basic auth, or session based auth.
+I use this to access my ipython notebook instance running on a server more securely.
 
-This simple proxy is intended to listen on public ports, authenticate access if user is not logged in, and then proxy all traffic to ipython notebook.
+# Usage:
+go get -u github.com/varung/letsproxy
+# cd to the folder
+go build
+sudo ./letsproxy --target {IP}:{PORT}
 
-Using letsencrypt, this proxy automatically generates a SSL cert as well, avoiding the need for self-signed certs and browser warnings
-
-As a user, you need to have a domain name and assign it to your server. After that this will take care of the rest.
-
-It can of course be used in front of any web app, not just ipython notebook, but that was my motivating example.
+since letsproxy wants to listen on 443, you'll need to run it with sudo, or, use the included bash script to give letsproxy the privileged port capability
