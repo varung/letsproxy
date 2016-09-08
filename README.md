@@ -6,9 +6,12 @@ Why? You want to run a web server behind SSL and authentication. letsproxy uses 
 I use this to access my ipython notebook instance running on a server more securely.
 
 # Usage:
+
+```
 go get -u github.com/varung/letsproxy
 # cd to the folder
 go build
 sudo ./letsproxy --target {IP}:{PORT}
+```
 
 since letsproxy wants to listen on 443, you'll need to run it with sudo, or, use the included bash script to give letsproxy the privileged port capability
