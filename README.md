@@ -20,6 +20,6 @@ sudo ./basic_auth --target {IP}:{PORT}
 
 since letsproxy wants to listen on 443, you'll need to run it with sudo, or, use the included bash script to give letsproxy the privileged port capability
 
-basic_auth uses http basic auth
-auth uses a very simple system for managing accounts and passwords with sessions
-noauth, does no auth (i.e., still ssl, but no password required)
+* basic_auth uses http basic auth
+* auth uses a very simple system for managing accounts and passwords with sessions
+* noauth, does no auth (i.e., still ssl, but no password required)
