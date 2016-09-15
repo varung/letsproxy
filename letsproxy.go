@@ -12,6 +12,7 @@ import (
 )
 
 func Proxy(target string) func(w http.ResponseWriter, r *http.Request) {
+	var err error
 	url, err := url.Parse("http://" + target)
 	if err != nil {
 		log.Fatal(err)
