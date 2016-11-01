@@ -20,23 +20,27 @@ func Proxy(target string) func(w http.ResponseWriter, r *http.Request) {
 	httpProxy := httputil.NewSingleHostReverseProxy(url)
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !IsWebSocket(r) {
+			log.Println("Not WebSocket:", r.URL.String())
 			httpProxy.ServeHTTP(w, r)
 		} else {
+			log.Println("WebSocket:", r.URL.String())
 			dialer := net.Dialer{KeepAlive: time.Second * 10}
 			d, err := dialer.Dial("tcp", target)
 			if err != nil {
+				log.Printf("ERROR: dialing websocket backend %s: %v\n", target, err)
 				http.Error(w, "Error contacting backend server.", 500)
-				log.Printf("Error dialing websocket backend %s: %v", target, err)
 				return
 			}
 			hj, ok := w.(http.Hijacker)
 			if !ok {
+				log.Println("ERROR: Not Hijackable")
 				http.Error(w, "Internal Error: Not Hijackable", 500)
+				return
 				return
 			}
 			nc, _, err := hj.Hijack()
 			if err != nil {
-				log.Printf("Hijack error: %v", err)
+				log.Printf("ERROR: Hijack error: %v\n", err)
 				return
 			}
 			defer nc.Close()
@@ -45,7 +49,7 @@ func Proxy(target string) func(w http.ResponseWriter, r *http.Request) {
 			// copy the request to the target first
 			err = r.Write(d)
 			if err != nil {
-				log.Printf("Error copying request to target: %v", err)
+				log.Printf("ERROR: copying request to target: %v\n", err)
 				return
 			}
 
@@ -62,6 +66,9 @@ func Proxy(target string) func(w http.ResponseWriter, r *http.Request) {
 }
 
 func IsWebSocket(req *http.Request) bool {
+	//log.Println("IsWebSocket called: ", req.URL.String())
+	//log.Println("Connection", req.Header["Connection"])
+	//log.Println("Upgrade:", req.Header["Upgrade"])
 
 	conn_hdr := ""
 	conn_hdrs := req.Header["Connection"]
