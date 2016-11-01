@@ -62,7 +62,6 @@ func Proxy(target string) func(w http.ResponseWriter, r *http.Request) {
 }
 
 func IsWebSocket(req *http.Request) bool {
-	log.Println("Request: ", req.Proto, req.Host, req.RemoteAddr, req.Method, req.Cookies(), req.URL.String())
 
 	conn_hdr := ""
 	conn_hdrs := req.Header["Connection"]
@@ -79,4 +78,31 @@ func IsWebSocket(req *http.Request) bool {
 	}
 
 	return upgrade_websocket
+}
+
+// Logging
+type LogRecord struct {
+	http.ResponseWriter
+	status int
+}
+
+func (r *LogRecord) Write(p []byte) (int, error) {
+	return r.ResponseWriter.Write(p)
+}
+
+func (r *LogRecord) WriteHeader(status int) {
+	r.status = status
+	r.ResponseWriter.WriteHeader(status)
+}
+
+func WrapHandler(f http.Handler, verbose bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		record := &LogRecord{
+			ResponseWriter: w,
+		}
+		f.ServeHTTP(record, r)
+		if record.status == http.StatusBadRequest || verbose {
+			log.Println(r.RemoteAddr, record.status, r.Method, r.Host, r.URL.Path)
+		}
+	}
 }
