@@ -20,10 +20,10 @@ func Proxy(target string) func(w http.ResponseWriter, r *http.Request) {
 	httpProxy := httputil.NewSingleHostReverseProxy(url)
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !IsWebSocket(r) {
-			log.Println("Not WebSocket:", r.URL.String())
+			//log.Println("Not WebSocket:", r.URL.String())
 			httpProxy.ServeHTTP(w, r)
 		} else {
-			log.Println("WebSocket:", r.URL.String())
+			//log.Println("WebSocket:", r.URL.String())
 			dialer := net.Dialer{KeepAlive: time.Second * 10}
 			d, err := dialer.Dial("tcp", target)
 			if err != nil {

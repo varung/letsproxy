@@ -131,25 +131,25 @@ func main() {
 	http.HandleFunc("/exec", HandleExec)
 	http.HandleFunc("/reboot", HandleReboot)
 
+	// handle uploads
+	uploader := letsproxy.Uploader{TmpDir: "/tmp"}
+	http.Handle("/upload", &uploader)
+
 	// equivalent nginx: try_files $uri $uri/ $uri/index.html @compute;
 	proxy := http.HandlerFunc(letsproxy.Proxy("127.0.0.1:8282"))
 	http.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("\n\ntryfiles: ", r.URL.Path)
+		//log.Println("\n\ntryfiles: ", r.URL.Path)
 		// if file not present in public directory, then proxy
 		f, _ := public_dir.Open(r.URL.Path)
 		if f == nil {
-			log.Println("proxying", r.URL.Path)
+			//log.Println("proxying", r.URL.Path)
 			proxy.ServeHTTP(w, r)
 		} else {
-			log.Println("serving", r.URL.Path)
+			//log.Println("serving", r.URL.Path)
 			f.Close()
 			public_fs.ServeHTTP(w, r)
 		}
 	}))
-
-	// TODO:
-	// /reboot
-	// /upload
 
 	// letsencrypt specific stuff
 	var m letsencrypt.Manager
